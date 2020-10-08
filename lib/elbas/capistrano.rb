@@ -22,7 +22,7 @@ def autoscale(groupname, properties = {})
     server instance.hostname, props
   end
 
-  if instances.any? || fetch(:ami_using_main_id).present?
+  if instances.any?
     after 'deploy', 'elbas:deploy'
   else
     error <<~MESSAGE
