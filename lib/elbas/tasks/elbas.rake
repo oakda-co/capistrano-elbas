@@ -17,7 +17,11 @@ namespace :elbas do
       asg = Elbas::AWS::AutoscaleGroup.new aws_autoscale_group_name
 
       info "Creating AMI from a running instance..."
-      ami = Elbas::AWS::AMI.create asg.instances.running.sample
+      if fetch(:ami_using_main_id).present?
+        ami = Elbas::AWS::AMI.create(Elbas::AWS::InstanceCollection.new(fetch(:ami_using_main_id)).instances[0])
+      else
+        ami = Elbas::AWS::AMI.create(asg.instances.running.sample)
+      end
       ami.tag 'ELBAS-Deploy-group', asg.name
       ami.tag 'ELBAS-Deploy-id', env.timestamp.to_i.to_s
       info  "Created AMI: #{ami.id}"
